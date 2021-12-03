@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeng.springboot.mapper.BookMapper">
+
+    <!-- public Type getTypeById(Integer id); -->
+    <select id="getTypeById" resultType="com.jfeng.springboot.bean.Type">
+        select * from type where type_id = #{typeId}
+    </select>
+
+    <resultMap id="BookByStep" type="com.jfeng.springboot.bean.Book">
+        <id column="book_id" property="bookId"/>
+        <result column="book_name" property="bookName"/>
+        <result column="book_pic" property="bookPic"/>
+        <result column="book_intro" property="bookIntro"/>
+        <result column="book_type" property="bookType"/>
+        <association property="typeBook"
+                     select="com.jfeng.springboot.mapper.BookMapper.getTypeById"
+                     column="book_type">
+        </association>
+    </resultMap>
+
+    <!-- public List<Book> getAllBook(); -->
+    <select id="getAllBook" resultMap="BookByStep">
+        select * from book
+    </select>
+
+    <!-- public void addBook(Book book); -->
+    <insert id="addBook">
+        insert into book(book_name, book_type, book_intro, book_pic)
+        values(#{bookName}, #{bookType}, #{bookIntro}, #{bookPic})
+    </insert>
+
+    <!-- public int delBook(Integer bookId); -->
+    <delete id="delBook">
+        delete from book where book_id = #{bookId}
+    </delete>
+
+    <!-- public Book queryBookById(Integer bookId); -->
+    <select id="queryBookById" resultMap="BookByStep">
+        select * from book where book_id = #{bookId}
+    </select>
+
+    <!-- public int deleteBatch(List<Integer> ids); -->
+    <delete id="deleteBatch">
+        delete from book where book_id in
+        <foreach item="item_Id" collection="list" open="(" separator="," close=")">
+            #{item_Id}
+        </foreach>
+    </delete>
+
+    <!-- public int updateBookById(Book book); -->
+    <update id="updateBookById">
+        update book
+        <trim prefix="set" suffixOverrides=",">
+            <if test="bookName != null">
+                book_name = #{bookName},
+            </if>
+            <if test="bookType != null">
+                book_type = #{bookType},
+            </if>
+            <if test="bookIntro != null">
+                book_intro = #{bookIntro},
+            </if>
+            <if test="bookPic != null">
+                book_pic = #{bookPic},
+            </if>
+        </trim>
+        where book_id = #{bookId}
+    </update>
+
+    <!-- public List<Book> searchBook(String searchBook) -->
+    <select id="searchBook" resultMap="BookResultMap">
+        select * from book b, type t where b.book_type = t.type_id
+        <if test="searchBook != null and searchBook != ''">
+            AND CONCAT(b.book_name, t.type_name) LIKE CONCAT('%', #{searchBook}, '%')
+        </if>
+    </select>
+
+    <resultMap id="BookResultMap" type="com.jfeng.springboot.bean.Book">
+        <id property="bookId" column="book_id"/>
+        <result property="bookName" column="book_name"/>
+        <result property="bookPic" column="book_pic"/>
+        <result property="bookIntro" column="book_intro"/>
+        <result property="bookType" column="book_type"/>
+        <association property="typeBook" column="book_type" javaType="com.jfeng.springboot.bean.Type">
+            <id column="type_id" property="typeId"/>
+            <result column="type_name" property="typeName"/>
+        </association>
+    </resultMap>
+</mapper>

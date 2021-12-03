@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeng.springboot.mapper.UserMapper">
+
+    <!--根据用户名查询该用户是否存在-->
+    <!--public User getUserByName(String username);-->
+    <select id="getUserByName" resultType="com.jfeng.springboot.bean.User">
+        select * from user where userName = #{userName}
+    </select>
+
+    <!--添加用户-->
+    <!--public int addUser(@Param("userName") String username, @Param("password") String password, @Param("email") String email);-->
+    <insert id="addUser">
+        insert into user(userName, password, email) values (#{userName}, #{password}, #{email})
+    </insert>
+
+    <!--根据用户名和邮箱查询密码-->
+    <!--public User findPwd(@Param("userName") String username, @Param("email") String email);-->
+    <select id="findPwd" resultType="com.jfeng.springboot.bean.User">
+        select * from user where userName = #{userName} and email = #{email}
+    </select>
+
+    <!--根据用户名和密码查询该用户是否存在-->
+    <!--public User loginGo(@Param("userName") String username, @Param("password") String password);-->
+    <select id="loginGo" resultType="com.jfeng.springboot.bean.User">
+        select * from user where userName = #{userName} and password = #{password}
+    </select>
+
+    <!-- public int delUser(Integer id); -->
+    <delete id="delUser">
+        delete from user where id = #{id}
+    </delete>
+
+</mapper>

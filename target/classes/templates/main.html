@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>首页</title>
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/bootstrap-3.4.1-dist/css/bootstrap.min.css}" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script th:src="@{/bootstrap-3.4.1-dist/js/bootstrap.min.js}" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script th:src="@{/assets/js/ie-emulation-modes-warning.js}"></script>
+    <link th:href="@{/assets/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/assets/css/ie10-viewport-bug-workaround.css}" rel="stylesheet">
+    <script th:src="@{/assets/js/ie10-viewport-bug-workaround.js}"></script>
+    <script th:src="@{/assets/js/vendor/holder.min.js}"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/}">首页</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" style="margin-right: 40px;">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a style="color: wheat;">[[${session.loginUser.userName}]]</a></li>
+                <li>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">设置 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:delUser();">注销账号</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="javascript:exitLogin();">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-right" autocomplete="off ">
+                <div class="input-group">
+                <input type="text" id="input_searchBook" class="form-control" placeholder="请输入书籍名或书籍类型...">
+                <div class="input-group-btn">
+                    <button class="btn btn-primary" type="button" onclick="searchBook()">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a href="javascript:delUser();">注销账号</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="javascript:exitLogin();">退出登录</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <span style="font-size: 36px;">书架</span>
+            <span style="margin-left: 800px;"></span>
+            <button class="btn btn-primary" id="addBook">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 添加
+            </button>
+            <button class="btn btn-danger" id="delAllBook">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除
+            </button>
+            <hr/>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead id="th_searchBook">
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="check_all"/>
+                        </th>
+                        <th>#</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>图片</th>
+                        <th>简介</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="book_show">
+                    </tbody>
+                </table>
+            </div>
+            <!-- 显示分页信息 -->
+            <div class="row">
+                <!-- 分页文字信息 -->
+                <div class="col-md-6" id="page_info_area">
+                </div>
+                <!-- 分页条信息 -->
+                <div class="col-md-6" id="page_nav_area">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 添加书籍模态框 -->
+<div class="modal fade" id="bookAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">书籍添加</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" autocomplete="off">
+                    <div class="form-group">
+                        <label for="bookName" class="col-sm-2 control-label">bookName</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="bookName" class="form-control" id="bookName" placeholder="bookName">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">bookType</label>
+                        <div class="col-sm-4">
+                            <!-- 书籍类型提交类型id即可 -->
+                            <select class="form-control" name="bookType" id="bookType">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookIntro" class="col-sm-2 control-label">bookIntro</label>
+                        <div class="col-sm-10">
+                            <textarea cols="55" rows="4" name="bookIntro" id="bookIntro" placeholder="bookIntro"></textarea>
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                </form>
+                <form class="form-horizontal" id="uploadForm">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">bookPic</label>
+                        <div class="col-sm-10">
+                            <label class="col-sm-2 control-label">
+                                <img th:src="@{/images/fileupload.png}" id="avarimgs" style="width: 120px; height: 120px;"/>
+                                <input type="file" accept="*/*" name="bookPic" id="bookPic" onchange="addBookPic(this)" class="hidden"/>
+                            </label>
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="book_save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 书籍修改模态框 -->
+<div class="modal fade" id="bookUpdateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">书籍修改</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" autocomplete="off">
+                    <div class="form-group">
+                        <label for="update_bookName" class="col-sm-2 control-label">bookName</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="bookName" class="form-control" id="update_bookName" placeholder="bookName">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">bookType</label>
+                        <div class="col-sm-4">
+                            <!-- 书籍类型提交类型id即可 -->
+                            <select class="form-control" name="bookType" id="update_bookType">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="update_bookIntro" class="col-sm-2 control-label">bookIntro</label>
+                        <div class="col-sm-10">
+                            <textarea cols="55" rows="4" name="bookIntro" id="update_bookIntro" placeholder="bookIntro"></textarea>
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="update_btn">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    var totalRecord;
+    var nowPage;
+    var getBookId;
+    //1.页面加载完成后，直接发送ajax请求，要到分页数据
+    $(function() {
+        to_page(1);
+    });
+
+    function to_page(pn) {
+        $.ajax({
+            type: "POST",
+            url: "/getAllBook",
+            data: {pn: pn},
+            dataType: "json",
+            success: function (result) {
+                if (result.total > 0) {
+                    //显示书籍信息
+                    book_info(result);
+                    //2、解析并显示分页信息
+                    page_info(result);
+                    //3、解析显示分页条数据
+                    page_nav(result);
+                } else {
+                    searchBook();
+                }
+            }
+        });
+    }
+
+    function book_info(result) {
+        $("#book_show").empty();
+        var bookTd = "";
+        $.each(result.list, function (index, book) {
+            bookTd += "<tr id='tr_"+book.bookId+"'>";
+            bookTd += "<td><input type='checkbox' class='check_item'/></td>";
+            bookTd += "<td>"+book.bookId+"</td>";
+            bookTd += "<td>"+book.bookName+"</td>";
+            bookTd += "<td>"+book.typeBook.typeName+"</td>";
+            bookTd += "<td><img src='pic/"+book.bookPic+"' style='width: 130px; height: 130px;'></td>";
+            bookTd += "<td>"+book.bookIntro+"</td>";
+            bookTd += "<td>"+
+                "<button class='btn btn-primary edit_btn' onclick='queryBookById("+book.bookId+")'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> 修改</button>"+
+                "<button class='btn btn-danger' onclick='delBook("+book.bookId+")'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span> 删除</button>"+
+                "</td>";
+            bookTd += "</tr>";
+        });
+        $("#book_show").append(bookTd);
+    }
+
+    //解析显示分页信息
+    function page_info(result) {
+        $("#page_info_area").empty();
+        $("#page_info_area").append("当前第 "+result.pageNum+" 页，总共 "+result.pages+" 页，总共 "+result.total+" 条记录");
+        totalRecord = result.total;
+        nowPage = result.pageNum;
+    }
+
+    function page_nav(result) {
+        $("#page_nav_area").empty();
+        var ul = $("<ul></ul>").addClass("pagination");
+        var firstPageLi = $("<li></li>").append($("<a></a>").append("首页").attr("href","#"));
+        var prePageLis = $("<li></li>").append($("<a></a>").append("&laquo;"));
+        if(result.hasPreviousPage == false){
+            firstPageLi.addClass("disabled");
+            prePageLis.addClass("disabled");
+        } else {
+            //跳转到首页
+            firstPageLi.click(function (){
+                to_page(1);
+            });
+            //上一页
+            prePageLis.click(function (){
+                to_page(result.pageNum-1);
+            });
+        }
+
+        var nextPageLis = $("<li></li>").append($("<a></a>").append("&raquo;"));
+        var lastPageLis = $("<li></li>").append($("<a></a>").append("末页").attr("href","#"));
+        if(result.hasNextPage == false){
+            nextPageLis.addClass("disabled");
+            lastPageLis.addClass("disabled");
+        } else {
+            //下一页
+            nextPageLis.click(function (){
+                to_page(result.pageNum+1);
+            });
+            //跳转到末页
+            lastPageLis.click(function (){
+                to_page(result.pages);
+            });
+        }
+
+        //添加首页和前一页
+        ul.append(firstPageLi).append(prePageLis);
+        //遍历给ul中添加页码
+        $.each(result.navigatepageNums,function (index,item){
+
+            var numli = $("<li></li>").append($("<a></a>").append(item));
+            if(result.pageNum == item){
+                numli.addClass("active");
+            }
+            //跳转页面
+            numli.click(function (){
+                to_page(item);
+            });
+
+            ul.append(numli);
+        });
+        //添加下一页和末页
+        ul.append(nextPageLis).append(lastPageLis);
+        //把ul添加到nav
+        var navEle = $("<nav></nav>").append(ul);
+        navEle.appendTo("#page_nav_area");
+    }
+
+    //清空表单样式及内容
+    function reset_form(ele){
+        $(ele)[0].reset();
+        //清空表单样式
+        $(ele).find(".help-block").text("");
+    }
+
+    $("#addBook").click(function (){
+        //清除表单样式
+        reset_form("#bookAddModal form");
+        //发送ajax请求查出类型信息，显示在下拉列表中
+        getBookType("#bookAddModal select");
+        //弹出模态框
+        $('#bookAddModal').modal({
+            backdrop:"static"
+        });
+    });
+
+    //查询书籍类型，并放入下拉框中
+    function getBookType(ele) {
+        //清空之前下拉列表的值
+        $(ele).empty();
+        $.ajax({
+            type: "POST",
+            url: "/getBookType",
+            dataType: "json",
+            success: function (result) {
+                if (result != null) {
+                    $.each(result,function(){
+                        var optionEle = $("<option></option>").append(this.typeName).attr("value",this.typeId);
+                        optionEle.appendTo(ele);
+                    });
+                }
+            }
+        });
+    }
+
+    //添加书籍
+    $("#book_save").click(function () {
+        if ($("#bookName").val() == "") {
+            alert("书名不能为空！");
+            return;
+        } else if ($("#bookIntro").val() == "") {
+            alert("书籍简介不能为空！");
+            return;
+        } else if ($("#bookPic").val() == "") {
+            alert("图片不能为空！");
+            return;
+        } else {
+            let formData = new FormData();
+            formData.append("bookPic", $("#bookPic")[0].files[0]);
+            formData.append("bookName", $("#bookName").val());
+            formData.append("bookType", $("#bookType").val());
+            formData.append("bookIntro", $("#bookIntro").val());
+            $.ajax({
+                url: "/addBook",
+                type: "POST",
+                async: false,
+                cache: false,
+                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                processData: false,// 告诉jQuery不要去处理发送的数据
+                data: formData,
+                success: function (result) {
+                    if (result == "success") {
+                        $("#th_searchBook").show();
+                        $("#bookAddModal").modal('hide');
+                        $("#avarimgs").attr("src", "/images/fileupload.png");
+                        //添加完成后来到最后一页，显示刚才保存的数据
+                        //发送ajax请求显示最后一页数据即可
+                        to_page(totalRecord);
+                        $("#page_info_area").show();
+                        $("#page_nav_area").show();
+                    } else {
+                        alert("添加失败！！");
+                    }
+                }
+            });
+        }
+    });
+
+    //书籍图片选择后显示
+    function addBookPic(obj) {
+        var file = obj.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = document.getElementById("avarimgs");
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    //删除书籍
+    function delBook(id) {
+        if(confirm("确认删除？")) {
+            $.ajax({
+                type: "POST",
+                url: "/delBook",
+                data: {
+                    bookId: id
+                },
+                dataType: "json",
+                success: function (result){
+                    if (result == 1) {
+                        alert("删除成功！！！");
+                        //回到当前页面
+                        to_page(nowPage);
+                    } else {
+                        alert("删除失败！！！");
+                    }
+                }
+            });
+        }
+    }
+
+    //完成全选/全不选功能
+    $("#check_all").click(function(){
+        //attr获取checked是undefined;
+        //我们这些dom原生的属性；attr获取自定义属性的值；
+        //prop修改和读取dom原生属性的值
+        $(".check_item").prop("checked",$(this).prop("checked"));
+    });
+
+    //check_item
+    $(document).on("click",".check_item",function(){
+        //判断当前选择中的元素是否3个
+        var flag = $(".check_item:checked").length==$(".check_item").length;
+        $("#check_all").prop("checked",flag);
+    });
+
+    //查询书籍信息
+    function queryBookById(id) {
+        getBookType("#bookUpdateModal select");
+        $.ajax({
+            type: "POST",
+            url: "/queryBookById",
+            data: {
+                bookId: id
+            },
+            dataType: "json",
+            success: function (result) {
+                getBookId = result.bookId;
+                $("#update_bookName").val(result.bookName);
+                $("#bookUpdateModal select").val([result.bookType]);
+                $("#update_bookIntro").val(result.bookIntro);
+            }
+        });
+        $("#bookUpdateModal").modal({
+            backdrop:"static"
+        });
+    }
+
+    //点击修改，修改书籍信息
+    $("#update_btn").click(function() {
+        if ($("#update_bookName").val() == "") {
+            alert("书名不能为空！");
+            return;
+        } else if ($("#update_bookIntro").val() == "") {
+            alert("书籍简介不能为空！");
+            return;
+        } else {
+            //发送ajax请求保存修改的书籍数据
+            $.ajax({
+                type: "POST",
+                url: "/updateBookById/" + getBookId,
+                data: $("#bookUpdateModal form").serialize(),
+                dataType: "json",
+                success: function (result) {
+                    if (result == 1) {
+                        alert("修改成功！！！");
+                        //1、关闭模态框
+                        $("#bookUpdateModal").modal("hide");
+                        //2、回到本页面
+                        to_page(nowPage);
+                    } else {
+                        alert("修改失败！！")
+                    }
+                }
+            });
+        }
+    });
+
+    //点击全部删除，就批量删除
+    $("#delAllBook").click(function(){
+        var bookNames = "";
+        var del_idstr = "";
+        $.each($(".check_item:checked"),function(){
+            //this
+            bookNames += $(this).parents("tr").find("td:eq(2)").text()+",";
+            //组装书籍id字符串
+            del_idstr += $(this).parents("tr").find("td:eq(1)").text()+"-";
+        });
+        //去除bookNames多余的,
+        bookNames = bookNames.substring(0, bookNames.length-1);
+        //去除删除的id多余的-
+        del_idstr = del_idstr.substring(0, del_idstr.length-1);
+        if(confirm("确认删除【"+bookNames+"】吗？")){
+            //发送ajax请求删除
+            $.ajax({
+                type:"POST",
+                url:"/delAllBook",
+                data: {
+                    ids: del_idstr
+                },
+                dataType: "json",
+                success:function(result){
+                    if (result == 1) {
+                        alert("删除成功！！！");
+                        //回到当前页面
+                        to_page(nowPage);
+                        $("#check_all").prop("checked", false);
+                    } else {
+                        alert("删除失败！！！");
+                    }
+                }
+            });
+        }
+    });
+
+    function delUser() {
+        var id = [[${session.loginUser.id}]];
+        if (confirm("确定注销该账户？"))  {
+            $.ajax({
+                type: "POST",
+                url: "/delUser",
+                data: {
+                    id: id
+                },
+                dataType: "json",
+                success: function (result) {
+                    if(result == 1) {
+                        window.location.reload();
+                        alert("注销成功！！");
+                    }
+                }
+            });
+        }
+    }
+
+    function exitLogin() {
+        if (confirm("确定退出当前登录？"))  {
+            $.ajax({
+                type: "POST",
+                url: "/exitLogin",
+                dataType: "json",
+                success: function (result) {
+                    if(result == 1) {
+                        window.location.reload();
+                        alert("已退出登录！！");
+                    }
+                }
+            });
+        }
+    }
+
+    function searchBook() {
+        var searchBook = $("#input_searchBook").val();
+        $.ajax({
+            type: "POST",
+            url: "/searchBook",
+            data: {
+                searchBook: searchBook
+            },
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+                if (result.total > 0) {
+                    $("#th_searchBook").show();
+                    $("#page_info_area").show();
+                    $("#page_nav_area").show();
+                    $("#input_searchBook").val("");
+                    $("#book_show").empty();
+                    var bookTd = "";
+                    $.each(result.list, function (index, book) {
+                        bookTd += "<tr id='tr_"+book.bookId+"'>";
+                        bookTd += "<td><input type='checkbox' class='check_item'/></td>";
+                        bookTd += "<td>"+book.bookId+"</td>";
+                        bookTd += "<td>"+book.bookName+"</td>";
+                        bookTd += "<td>"+book.typeBook.typeName+"</td>";
+                        bookTd += "<td><img src='pic/"+book.bookPic+"' style='width: 130px; height: 130px;'></td>";
+                        bookTd += "<td>"+book.bookIntro+"</td>";
+                        bookTd += "<td>"+
+                            "<button class='btn btn-primary edit_btn' onclick='queryBookById("+book.bookId+")'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> 修改</button>"+
+                            "<button class='btn btn-danger' onclick='delBook("+book.bookId+")'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span> 删除</button>"+
+                            "</td>";
+                        bookTd += "</tr>";
+                    });
+                    $("#book_show").append(bookTd);
+                } else {
+                    $("#book_show").empty();
+                    $("#input_searchBook").val("");
+                    $("#th_searchBook").hide();
+                    $("#book_show").html("未找到相关数据");
+                    $("#page_info_area").hide();
+                    $("#page_nav_area").hide();
+                }
+            }
+        });
+    }
+</script>
+</html>

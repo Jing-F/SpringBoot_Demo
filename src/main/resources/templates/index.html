@@ -1,0 +1,85 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>BOOK MALL</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+       
+		<!-- All CSS Files Here -->
+        <link rel="stylesheet" th:href="@{/white/css/bootstrap.min.css}">
+        <link rel="stylesheet" th:href="@{/white/css/et-line-fonts.css}">
+        <link rel="stylesheet" th:href="@{/white/css/ionicons.min.css}">
+        <link rel="stylesheet" th:href="@{/white/css/magnific-popup.css}">
+        <link rel="stylesheet" th:href="@{/white/css/meanmenu.css}">
+        <link rel="stylesheet" th:href="@{/white/css/global.css}">
+        <link rel="stylesheet" th:href="@{/white/style.css}">
+        <link rel="stylesheet" th:href="@{/white/css/responsive.css}">
+        <script th:src="@{/white/js/vendor/modernizr-2.8.3.min.js}"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+ 		<!-- PRELOADER -->
+		<div class="page-loader" >
+			<div class="loader">Loading...</div>
+		</div>
+		<!-- /PRELOADER -->       
+		<!-- header start -->
+		<header id="sticky-header" class="header-fixed header-transparent">
+			<div class="header-area">
+				<div class="container sm-100">
+					<div class="row">
+						<div class="col-md-3 col-sm-2">
+							<div class="logo text-upper">
+								<h4><a th:href="@{/}">BOOK MALL</a></h4>
+							</div>
+						</div>
+						<div class="col-md-9 col-sm-10">
+							<div class="menu-area hidden-xs">
+								<nav>
+									<ul class="basic-menu clearfix">
+										<li><a th:href="@{/}">Home</a></li>
+										<li><a th:href="@{/}">about</a></li>
+									</ul>
+								</nav>							
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<!-- header end -->
+		
+		<!-- basic-slider start -->
+		<div class="basic-slider slide-6 height-100-vh">
+			<div class="container text-center">
+				<div class="hero-caption">
+					<div class=" hero-text">
+						<div class="slider-content white-bg-opacity">
+							<h2>BOOK MALL </h2>
+							<h4> Design | Development | Branding</h4>
+							<br/>
+							<a th:href="@{/login.do}"><button class="btn">Sign In</button></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- basic-slider end -->
+
+		<!-- All js plugins here -->
+        <script th:src="@{/white/js/vendor/jquery-1.12.0.min.js}"></script>
+        <script th:src="@{/white/js/bootstrap.min.js}"></script>
+        <script th:src="@{/white/js/isotope.pkgd.min.js}"></script>
+        <script th:src="@{/white/js/imagesloaded.pkgd.min.js}"></script>
+        <script th:src="@{/white/js/jquery.magnific-popup.min.js}"></script>
+        <script th:src="@{/white/js/jquery.meanmenu.js}"></script>
+        <script th:src="@{/white/js/plugins.js}"></script>
+        <script th:src="@{/white/js/main.js}"></script>
+    </body>
+</html>

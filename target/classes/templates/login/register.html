@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/bootstrap-3.4.1-dist/css/bootstrap.min.css}"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script th:src="@{/bootstrap-3.4.1-dist/js/bootstrap.min.js}"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/css/normalize.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+<div id="showRegister" class="formLeft" style="height: 460px;">
+    <img th:src="@{/images/2.jpg}">
+</div>
+<div class="formRight">
+    <!-- Register form -->
+    <form id="register" autocomplete="off">
+        <header>
+            <h1>用户注册</h1>
+            <span style="color: #ff0505;" id="msg">注册享受更多服务</span>
+        </header>
+        <section>
+            <label>
+                <p>用户名</p>
+                <input type="text" id="username" placeholder="请输入用户名">
+                <div class="border">
+                    <span id="userMsg" style="color: red; font-size: 6px;"></span>
+                </div>
+            </label>
+            <label>
+                <p>邮箱</p>
+                <input type="text" id="email" placeholder="请输入邮箱">
+                <div class="border">
+                    <span id="emailMsg" style="color: red; font-size: 6px;"></span>
+                </div>
+            </label>
+            <label>
+                <p>密码</p>
+                <input type="password" id="password" placeholder="请输入密码">
+                <div class="border">
+                    <span id="pwdMsg" style="color: red; font-size: 6px;"></span>
+                </div>
+            </label>
+            <label>
+                <p>重复密码</p>
+                <input type="password" id="rpassword" placeholder="请确认密码">
+                <div class="border">
+                    <span id="rpwdMsg" style="color: red; font-size: 6px;"></span>
+                </div>
+            </label>
+            <input type="button" value="注 册" class="btn btn-primary" style="margin-left: 30px; width: 240px;"
+                   onclick="addUser()"/>
+        </section>
+        <footer>
+          <span style="margin-left: 130px;"></span>
+            <a th:href="@{/login.do}">
+                <button type="button">返回</button>
+            </a>
+        </footer>
+    </form>
+</div>
+</body>
+<script type="text/javascript">
+    $(function () {
+        //验证用户名
+        $("#username").blur(function () {
+            var username = $("#username").val();
+            var nameReg = /(^[a-zA-Z0-9_-]{3,10}$)|(^[\u2E80-\u9FFF]{2,5})/;
+            if (!nameReg.test(username)) {
+                $("#userMsg").html("用户名可以是2-5位中文或者3-10位英文和数字的组合！");
+                $("#username").val("");
+                $("#username").focus();
+                return;
+            } else {
+                $("#userMsg").empty();
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/checkName.do",
+                data: {
+                    username: username
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result != "success") {
+                        $("#userMsg").html("用户名已存在！！");
+                    } else {
+                        $("#userMsg").empty();
+                    }
+                }
+            });
+        });
+
+        //验证邮箱
+        $("#email").blur(function () {
+            var email = $("#email").val();
+            var emailReg = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+            if (!emailReg.test(email)) {
+                $("#emailMsg").html("邮箱格式不正确（例：zsan@abc.com）！");
+                $("#email").val("");
+                $("#email").focus();
+                return;
+            } else {
+                $("#emailMsg").empty();
+            }
+        });
+
+        //验证密码
+        $("#password").blur(function () {
+            var password = $("#password").val();
+            var pwdReg = /^([a-zA-Z0-9_-]{3,10})$/;
+            if (!pwdReg.test(password)) {
+                $("#pwdMsg").html("密码由3-10位大小字母、数字组成！");
+                $("#password").val("");
+                $("#password").focus();
+                return;
+            } else {
+                $("#pwdMsg").empty();
+            }
+        });
+
+        //判断两次密码是否一致
+        $("#rpassword").blur(function () {
+            var password = $("#password").val();
+            var rpassword = $("#rpassword").val();
+            if (rpassword != password) {
+                $("#rpwdMsg").html("两次密码不一致！");
+                $("#rpassword").val("");
+                $("#rpassword").focus();
+                return;
+            } else {
+                $("#rpwdMsg").empty();
+            }
+        });
+    });
+
+    function addUser() {
+      //验证用户名
+      var username = $("#username").val();
+      var nameReg = /(^[a-zA-Z0-9_-]{3,10}$)|(^[\u2E80-\u9FFF]{2,5})/;
+      if (!nameReg.test(username)) {
+        $("#userMsg").html("用户名可以是2-5位中文或者3-10位英文和数字的组合！");
+        $("#username").val("");
+        $("#username").focus();
+        return;
+      } else {
+        $("#userMsg").empty();
+      }
+        //验证邮箱
+        var email = $("#email").val();
+        var emailReg = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!emailReg.test(email)) {
+            $("#emailMsg").html("邮箱格式不正确（例：zsan@abc.com）！");
+            $("#email").val("");
+            $("#email").focus();
+            return;
+        } else {
+            $("#emailMsg").empty();
+        }
+
+        //验证密码
+        var password = $("#password").val();
+        var pwdReg = /^([a-zA-Z0-9_-]{3,10})$/;
+        if (!pwdReg.test(password)) {
+            $("#pwdMsg").html("密码由3-10位大小字母、数字组成！");
+            $("#password").val("");
+            $("#password").focus();
+            return;
+        } else {
+            $("#pwdMsg").empty();
+        }
+
+        //判断两次密码是否一致
+        var password = $("#password").val();
+        var rpassword = $("#rpassword").val();
+        if (rpassword != password) {
+            $("#rpwdMsg").html("两次密码不一致！");
+            $("#rpassword").val("");
+            $("#rpassword").focus();
+            return;
+        } else {
+            $("#rpwdMsg").empty();
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/addUser.do",
+            data: {
+                userName: $("#username").val(),
+                password: $("#password").val(),
+                email: $("#email").val()
+            },
+            dataType: "json",
+            success: function (res) {
+                if (res == 1) {
+                    $("#msg").html("注册成功！！");
+                    $("#username").attr("disabled", "disabled");
+                    $("#email").attr("disabled", "disabled");
+                    $("#password").attr("disabled", "disabled");
+                    $("#rpassword").attr("disabled", "disabled");
+                } else {
+                    $("#msg").html("注册失败！！");
+                }
+            }
+        });
+    }
+</script>
+</html>

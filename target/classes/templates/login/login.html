@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>用户登录</title>
+
+  <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" th:href="@{/css/normalize.min.css}">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/bootstrap-3.4.1-dist/css/bootstrap.min.css}" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <script th:src="@{/bootstrap-3.4.1-dist/js/bootstrap.min.js}" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+
+</head>
+
+<body>
+  <div class="formLeft" style="height: 340px;">
+    <img th:src="@{/images/1.jpg}">
+  </div>
+  <div class="formRight">
+    <!-- Login form -->
+    <form id="login" autocomplete="off">
+      <header>
+        <h1>欢迎回来</h1>
+        <span style="color: #ff0505;" id="msg">请先登录</span>
+      </header>
+      <section>
+        <label>
+          <p>用户名</p>
+          <input type="text" id="username" placeholder="请输入用户名"/>
+          <div class="border">
+            <span id="userMsg" style="color: red;"></span>
+          </div>
+        </label>
+        <label>
+          <p>密码</p>
+          <input type="password" id="password" placeholder="请输入密码">
+          <div class="border">
+            <span id="pwdMsg" style="color: red;"></span>
+          </div>
+        </label>
+        <input type="button" value="登 录" class="btn btn-primary" style="margin-left: 30px; width: 240px;" onclick="loginGo()"/>
+      </section>
+      <footer>
+        <a th:href="@{/findPassword.do}"><button type="button">忘记密码？</button></a>
+        <span style="margin-left: 200px;"></span>
+        <a th:href="@{/register.do}"><button type="button">新用户？</button></a>
+      </footer>
+    </form>
+  </div>
+</body>
+<script type="text/javascript">
+  $(function () {
+    $("#username").blur(function () {
+      var username = $("#username").val();
+      if (username == "") {
+        $("#userMsg").html("用户名不能为空！！");
+        $("#username").val("");
+        $("#password").val("");
+        $("#username").focus();
+        return;
+      } else {
+        $("#userMsg").empty();
+      }
+    });
+
+      $("#password").blur(function () {
+        var password = $("#password").val();
+        if (password == "") {
+          $("#pwdMsg").html("密码不能为空！！");
+          $("#password").val("");
+          $("#password").focus();
+          return;
+        } else {
+          $("#pwdMsg").empty();
+        }
+      });
+  });
+
+  function loginGo() {
+    //验证用户名是否为空
+    var username = $("#username").val();
+
+    if (username == "") {
+      $("#userMsg").html("用户名不能为空！！");
+      $("#username").val("");
+      $("#password").val("");
+      $("#username").focus();
+      return;
+    } else {
+      $("#userMsg").empty();
+    }
+
+    //验证密码是否为空
+    var password = $("#password").val();
+    if (password == "") {
+      $("#pwdMsg").html("密码不能为空！！");
+      $("#password").val("");
+      $("#password").focus();
+      return;
+    } else {
+      $("#pwdMsg").empty();
+    }
+
+    $.ajax({
+      type: "POST",
+      url: "/loginGo.do",
+      data: {
+        userName: username,
+        password: password
+      },
+      dataType: "json",
+      success: function (result) {
+        if (result == 1) {
+          window.location.href="/main";
+        } else {
+          $("#username").val("");
+          $("#password").val("");
+          $("#username").focus();
+          $("#msg").html("账号或密码错误！！");
+        }
+      }
+    });
+  }
+</script>
+</html>
